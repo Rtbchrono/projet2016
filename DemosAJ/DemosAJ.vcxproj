@@ -84,6 +84,10 @@
   <ItemGroup>
     <ClCompile Include="projet.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="fonctions.h" />
+    <ClInclude Include="libs.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
