@@ -15,14 +15,16 @@ Description :		Ce programme est un jeu Tetris
 #include <algorithm>
 #include "../SDL2/include/SDL.h"
 #include "../SDL2_image/include/SDL_image.h"
+
+
 #include "fonctions.h"
 using namespace std;
 
 /*Constantes globales
 ****************************/
 //Taille de l'écran en pixels
-const int LARGEUR_FENETRE = 225;
-const int HAUTEUR_FENETRE = 500;
+const int LARGEUR_FENETRE = 167;
+const int HAUTEUR_FENETRE = 333;
 
 const int FACTEUR_RALENTISSEMENT_ANIMATION = 200;  //Pour rendre l'animation plus rapide, indiquer un chiffre plus petit
 
@@ -213,7 +215,7 @@ LTexture bloc4Texture;
 LTexture bloc5Texture;
 LTexture bloc6Texture;
 LTexture bloc7Texture;
-LTexture bloc8Texture;
+
 
 //Tableaux de rectangles de chaques images
 SDL_Rect grilleRect[nombre_IMAGES_TETRIS_CHARSET];
@@ -224,7 +226,7 @@ SDL_Rect bloc4Rect[nombre_IMAGES_TETRIS_CHARSET];
 SDL_Rect bloc5Rect[nombre_IMAGES_TETRIS_CHARSET];
 SDL_Rect bloc6Rect[nombre_IMAGES_TETRIS_CHARSET];
 SDL_Rect bloc7Rect[nombre_IMAGES_TETRIS_CHARSET];
-SDL_Rect bloc8Rect[nombre_IMAGES_TETRIS_CHARSET];
+
 
 
 //********************************* Fonctions du programme
@@ -285,8 +287,6 @@ bool init()
 	return success;
 }
 
-
-
 //Cette fonction est utilisée pour charger les images du programme dans leurs textures correspondantes
 bool loadMedia()
 {
@@ -294,7 +294,7 @@ bool loadMedia()
 	bool success = true;
 
 	//Load sprite sheet texture
-	if (!grilleTexture.loadFromFile("tetris/grille2.png"))
+	if (!grilleTexture.loadFromFile("tetris/grille.png"))
 	{
 		printf("Échec de chargement de l'image ! \n");
 		success = false;
@@ -305,32 +305,46 @@ bool loadMedia()
 		initialiserTetrisCharset(grilleRect, nombre_IMAGES_TETRIS_CHARSET, LARGEUR_FENETRE,HAUTEUR_FENETRE);
 	}
 
-	if (!bloc1Texture.loadFromFile("tetris/bloc1test.png"))
+	if (!bloc1Texture.loadFromFile("tetris/bloc1r1.png"))
 	{
 		printf("Échec de chargement de l'image ! \n");
 		success = false;
 	}
 	else
 	{
-		initialiserTetrisCharset(bloc1Rect, nombre_IMAGES_TETRIS_CHARSET, 110, 130);
+		initialiserTetrisCharset(bloc1Rect, nombre_IMAGES_TETRIS_CHARSET, 80, 82);
 	}
 
-	if (!bloc5Texture.loadFromFile("tetris/bloc4test.png"))
+	if (!bloc5Texture.loadFromFile("tetris/bloc4.png"))
 	{
 		printf("Échec de chargement de l'image ! \n");
 		success = false;
 	}
 	else
 	{
-		initialiserTetrisCharset(bloc5Rect, nombre_IMAGES_TETRIS_CHARSET, 110,130);
+		initialiserTetrisCharset(bloc5Rect, nombre_IMAGES_TETRIS_CHARSET, 80,82);
 	}
 
-
+	if (!bloc6Texture.loadFromFile("tetris/bloc5r1.png"))
+	{
+		printf("Échec de chargement de l'image ! \n");
+	}
+	else
+	{
+		initialiserTetrisCharset(bloc6Rect, nombre_IMAGES_TETRIS_CHARSET, 80, 82);
+	}
+	
+	if (!bloc7Texture.loadFromFile("tetris/bloc6r1.png"))
+	{
+		printf("Échec du chargement de l'image ! \n");
+	}
+	else
+	{
+		initialiserTetrisCharset(bloc7Rect, nombre_IMAGES_TETRIS_CHARSET, 80, 82);
+	}
 
 	return success;
 }
-
-
 
 //Cette fonction effectue une fermeture appropriée du programme, de l'environnement SDL et libère la mémoire des différents éléments SDL créés
 void close()
@@ -349,7 +363,6 @@ void close()
 	IMG_Quit();
 	SDL_Quit();
 }
-
 
 //Cette fonction est responsable de charger dans une texture l'image indiqueé en paramètre
 SDL_Texture* loadTexture(std::string path)
@@ -390,11 +403,7 @@ void initialiserTetrisCharset(SDL_Rect tableauRectangles[], int nombreImages, in
 		tableauRectangles[i].h = hauteurChaqueImage;
 	}
 }
-struct grille
-{
-	//si vide, siVideOuiNon =0, sinon 1
-	int siVideOuNon = 0;
-};
+
 //Fonction principale du programme
 int main(int argc, char* args[])
 {
@@ -434,127 +443,137 @@ int main(int argc, char* args[])
 		else
 		{
 			printf("\nProgramme OK!\n\n");
-
-			while (toupper(recommencer) == 'O')
-			{				
-				bool partiePerdue = false;
-				bool verifierCollision= false;
-				int positionBloc[20][10];
-				grille grilleTetris[20][10];
-				randomiserBlocs(compteurBlocs, bloc);
-				int y = 0;
-				int x = 4;
-				int posY;
-				int posX;
-				while (partiePerdue == false)
+			while (quit == false)
+			{
+				while (toupper(recommencer) == 'O')
 				{
-					bloc[compteurBlocs] = 1;
-					//switch qui va prendre le bon bloc
-					switch (bloc[compteurBlocs])
+					bool partiePerdue = false;
+					bool verifierCollision = false;
+					grille positionBloc[21][10];
+					grille grilleTetris[21][10];
+
+					grilleTexture.render(positionGrilleX, positionGrilleY, grilleRect);
+					//initialise la derniere ligne (jeu 
+					for (size_t i = 0; i < 10; i++)
 					{
-						
+						grilleTetris[21][i].siVideOuNon = 1;
+						positionBloc[21][i].siVideOuNon = 1;
+					}
 
-					case 1:
-						posX = (4*17);
-						posY = 0;
-						bloc1Texture.render((x * 17), y, bloc1Rect);
-						
-						//faire fonction
+					randomiserBlocs(compteurBlocs, bloc);
+					int y = 0;
+					int x = 4;
+					int posY;
+					int posX;
+					int rotation = 0;
+				
+					//si rotation = 0 : le bloc est droit, si rotation = 1: le bloc est à droite, si rotation = 2: bloc bas, si = 3: bloc gauche
+					//si = 4: bloc est en haut
+					//grilleTexture.render(0, 0, grilleRect);
+					while (partiePerdue == false)
+					{
+						int nombreDeBlocs = 0;
+
+						rotation = 0;
+
+						//switch qui va prendre le bon bloc
+						switch (bloc[compteurBlocs])
+						{
+
+						case 1:
+							posX = 4;
+							posY = 0;
+
+							//evenement(e,quit,recommencer,verifierCollision,partiePerdue,posX,posY);
+							//Update screen
+							SDL_RenderPresent(rendererFenetre);
+
 							while (verifierCollision == false)
-							{
-								positionBloc[posY][posX] = 1;
-								positionBloc[posY][posX+(1*17)] = 1;
-								positionBloc[posY][posX+(2*17)] = 1;
-								positionBloc[posY][posX+(3*17)] = 1;
+							{	
+								//si le bloc est plat
+								positionBloc[posY][posX].siVideOuNon = 1;
+								positionBloc[posY][posX + 1].siVideOuNon = 1;
+								positionBloc[posY][posX + 2].siVideOuNon = 1;
+								positionBloc[posY][posX + 3].siVideOuNon = 1;
 
-								
 
+								//si collision
+								if (positionBloc[posY][posX].siVideOuNon + Grille[posY][posX].siVideOuNon == 2 ||
+									positionBloc[posY][posX + 1].siVideOuNon + Grille[posY][posX + 1].siVideOuNon == 2 ||
+									positionBloc[posY][posX + 2].siVideOuNon + Grille[posY][posX + 2].siVideOuNon == 2 ||
+									positionBloc[posY][posX + 3].siVideOuNon + Grille[posY][posX + 2].siVideOuNon == 2)
+								{
+									verifierCollision = true;
+									bloc1Texture.render(posX * 17, ((posY - 1) * 17));
+									break;
+								}
+
+								//on descend de 1 et on remet la valeur de la case à vide
+								else
+								{
+									positionBloc[posY][posX].siVideOuNon = 0;
+									positionBloc[posY][posX + 1].siVideOuNon = 0;
+									positionBloc[posY][posX + 2].siVideOuNon = 0;
+									positionBloc[posY][posX + 3].siVideOuNon = 0;
+								}
+
+								//evenement(positionBloc,grilleTetris,bloc, compteurBlocs ,e, quit, recommencer, verifierCollision, partiePerdue, posX, posY, rotation);
+								posY += 1;
+
+								//Netoyyer l'écran (Clear Screen)
+								SDL_RenderClear(rendererFenetre);
+								grilleTexture.render(0, 0, grilleRect);
+								bloc1Texture.render(posX * 17, posY * 17, bloc1Rect);
 								//Update screen
 								SDL_RenderPresent(rendererFenetre);
-
-								posY+= 17;
-								
+								compteurBlocs++;
 							}
-						
-					
-						//afficher bloc 1 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 1
-						break;
-					case 2:
-						//afficher bloc 2 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 2
-					case 3:
-						//afficher bloc 3 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 3
-						break;
-					case 4:
-						//afficher bloc 4 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 4
-						break;
-					case 5:
-						//afficher bloc 5 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 5
-						break;
-					case 6:
-						//afficher bloc 6 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 6
-						break;
-					default:
-						//afficher bloc 7 a la position 7,25 de la grille
-						//initialiser position bloc en fonction du bloc 7
-						break;
-					} //fin switch
 
-					//Handle events on queue
-					while (SDL_PollEvent(&e) != 0)
+
+							//afficher bloc 1 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 1
+							break;
+						case 2:
+							posX = 0;
+							posY = 4;
+							bloc2Texture.render(posX, posY, bloc2Rect);
+							//afficher bloc 2 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 2
+						case 3:
+							//afficher bloc 3 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 3
+							break;
+						case 4:
+							//afficher bloc 4 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 4
+							break;
+						case 5:
+							//afficher bloc 5 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 5
+							break;
+						case 6:
+							//afficher bloc 6 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 6
+							break;
+						default:
+							//afficher bloc 7 a la position 7,25 de la grille
+							//initialiser position bloc en fonction du bloc 7
+							break;
+						} //fin switch
+
+
+					} //fin du while partiePerdue==false
+
+					cout << "Partie Perdue. Voulez vous recommencer?" << endl;
+					do
 					{
-						//Si l'utilisateur appuiie sur le bouton 'fermer' de la fenêtre
-						if (e.type == SDL_QUIT)
-						{
-							quit = true;
-						}
+						cout << "Entrer o pour oui, n pour non: ";
+						cin >> recommencer;
+					} while (toupper(recommencer) != 'O' && toupper(recommencer) != 'N');
 
-						else if (e.type == SDL_KEYDOWN)
-						{
-							switch (e.key.keysym.sym)
-							{
-							case SDLK_LEFT:
-								//déplacer le tetris à gauche d'une case
-								break;
-							case SDLK_RIGHT:
-								//déplacer le tetris à droite d'une case
-								break;
-							case SDLK_UP:
-								//faire une rotation vers la droite du tetris
-								break;
-							case SDLK_DOWN:
-								//accélérer la descente du tetris
-
-								/*	case SDLK_ESCAPE:
-								bool pause = true;
-								while (pause != true)
-								{
-								cout << "Appuyer sur une echap pour continuer";
-								cin >> pause;
-								}*/
-
-								/*default:*/
-
-								break;
-
-							}//fin du switch evenements
-						}
-					} //fin du while sdl pool event
-				} //fin du while partiePerdue==false
-
-				cout << "Partie Perdue. Voulez vous recommencer?" << endl;
-				do
-				{
-					cout << "Entrer o pour oui, n pour non: ";
-					cin >> recommencer;
-				} while (toupper(recommencer) != 'O' && toupper(recommencer) != 'N');
-				
-			}//fin while
+				}//fin while
+			}
+			
 			
 		}//fin de l'accolade du else contenant le code
 	}//fin du else (si le jeu s'est initialisé)

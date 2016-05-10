@@ -85,6 +85,7 @@
     <ClCompile Include="projet.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="blocs.h" />
     <ClInclude Include="fonctions.h" />
     <ClInclude Include="libs.h" />
   </ItemGroup>
